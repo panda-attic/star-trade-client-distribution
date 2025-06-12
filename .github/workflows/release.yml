@@ -32,7 +32,7 @@ jobs:
 
       - name: Create Env File
         run: |
-          echo "VITE_APP_ENV=production" > .env
+          echo "VITE_APP_ENV=${{ inputs.env }}" > .env
           echo "VITE_APP_API_BASE_URL=${{ vars.API_BASE_URL }}" >> .env
           cat .env
 
