@@ -12,56 +12,65 @@ on:
 
 jobs:
   release:
-    strategy:
-      matrix:
-        os: [macos-13,macos-15,windows-2025] # 分别用来构建 mac-x64、mac-arm64、win-x64，具体可查看 https://docs.github.com/zh/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#%E7%94%A8%E4%BA%8E%E5%85%AC%E5%85%B1%E5%AD%98%E5%82%A8%E5%BA%93%E7%9A%84-github-%E6%89%98%E7%AE%A1%E7%9A%84%E6%A0%87%E5%87%86%E8%BF%90%E8%A1%8C%E5%99%A8
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     os: [macos-13,macos-15,windows-2025] # 分别用来构建 mac-x64、mac-arm64、win-x64，具体可查看 https://docs.github.com/zh/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#%E7%94%A8%E4%BA%8E%E5%85%AC%E5%85%B1%E5%AD%98%E5%82%A8%E5%BA%93%E7%9A%84-github-%E6%89%98%E7%AE%A1%E7%9A%84%E6%A0%87%E5%87%86%E8%BF%90%E8%A1%8C%E5%99%A8
 
-    runs-on: ${{ matrix.os }}
-
+    # runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.env }}
     steps:
       - name: Checkout Code
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.REPOSITORY_SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          # 从仓库地址中提取主机名
-          HOST=$(echo "${{ vars.REPOSITORY_FULL_URL }}" | sed 's/.*@\([^:/]*\).*/\1/')
-          echo "Host $HOST"
-          ssh-keyscan -t rsa "$HOST" >> ~/.ssh/known_hosts
-          git clone --depth 1 --branch "${{ inputs.version }}" ${{ vars.REPOSITORY_FULL_URL }} .
-
-      - name: Create Env File
-        run: |
-          echo "VITE_APP_ENV=${{ inputs.env }}" > .env
-          echo "VITE_APP_API_BASE_URL=${{ vars.API_BASE_URL }}" >> .env
-          cat .env
-
-      - name: Setup Node Pnpm
-        uses: wyvox/action-setup-pnpm@v3.2.0
+        uses: actions/checkout@v4
         with:
-          node-version-file: '.nvmrc'
-          # pnpm 版本会自动读取 package.json#packageManager 字段
+          repository: '62256f1a16f8e034350f4d3c/star-trade/star-trade-fronend'
+          github-server-url: 'codeup.aliyun.com'
+          ssh-key: ${{ secrets.REPOSITORY_SSH_PRIVATE_KEY }}
+    
+      # - name: Checkout Code
+      #   run: |
+      #     mkdir -p ~/.ssh
+      #     echo "${{ secrets.REPOSITORY_SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+      #     chmod 600 ~/.ssh/id_rsa
+      #     # 从仓库地址中提取主机名
+      #     HOST=$(echo "${{ vars.REPOSITORY_FULL_URL }}" | sed 's/.*@\([^:/]*\).*/\1/')
+      #     echo "Host $HOST"
+      #     ssh-keyscan -t rsa "$HOST" >> ~/.ssh/known_hosts
+      #     git clone --depth 1 --branch "${{ inputs.version }}" ${{ vars.REPOSITORY_FULL_URL }} .
 
-      - name: Install Dependencies
-        run: |
-          node -v
-          pnpm -v
-          pnpm install
+      # - name: Create Env File
+      #   run: |
+      #     echo "VITE_APP_ENV=${{ inputs.env }}" > .env
+      #     echo "VITE_APP_API_BASE_URL=${{ vars.API_BASE_URL }}" >> .env
+      #     cat .env
 
-      - name: Build Mac
-        if: startsWith(matrix.os, 'macos')
-        run: pnpm build:mac
+      # - name: Setup Node Pnpm
+      #   uses: wyvox/action-setup-pnpm@v3.2.0
+      #   with:
+      #     node-version-file: '.nvmrc'
+      #     # pnpm 版本会自动读取 package.json#packageManager 字段
 
-      - name: Build Windows
-        if: startsWith(matrix.os, 'windows')
-        run: pnpm build:win
+      # - name: Install Dependencies
+      #   run: |
+      #     node -v
+      #     pnpm -v
+      #     pnpm install
 
-      - name: release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: ${{ inputs.version }}
-          files: |
-            dist/*.dmg
-            dist/*.exe
-            dist/*.zip
+      # - name: Build Mac
+      #   if: startsWith(matrix.os, 'macos')
+      #   run: pnpm build:mac
+
+      # - name: Build Windows
+      #   if: startsWith(matrix.os, 'windows')
+      #   run: pnpm build:win
+
+      # - name: release
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     name: ${{ inputs.version }}
+      #     files: |
+      #       dist/*.dmg
+      #       dist/*.exe
+      #       dist/*.zip
         
