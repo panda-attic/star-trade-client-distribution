@@ -32,10 +32,10 @@ jobs:
           echo "${{ secrets.REPOSITORY_SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           # 从仓库地址中提取主机名
-          HOST=$(echo "${{ vars.REPOSITORY_FULL_URL }}" | sed 's/.*@\([^:/]*\).*/\1/')
+          HOST=$(echo "${{ secrets.REPOSITORY_FULL_URL }}" | sed 's/.*@\([^:/]*\).*/\1/')
           echo "Host $HOST"
           ssh-keyscan -t rsa "$HOST" >> ~/.ssh/known_hosts
-          git clone --depth 1 --branch "${{ inputs.version }}" ${{ vars.REPOSITORY_FULL_URL }} .
+          git clone --depth 1 --branch "${{ inputs.version }}" ${{ secrets.REPOSITORY_FULL_URL }} .
 
       - name: Create Env File
         run: |
