@@ -41,6 +41,8 @@ jobs:
         run: |
           echo "VITE_APP_ENV=${{ inputs.env }}" > .env
           echo "VITE_APP_API_BASE_URL=${{ vars.API_BASE_URL }}" >> .env
+          echo "RENDERER_VITE_CLARITY_ID=${{ vars.CLARITY_ID }}" >> .env
+          echo "RENDERER_VITE_UMAMI_ID=${{ vars.UMAMI_ID }}" >> .env
 
       - name: Setup Node Pnpm
         uses: wyvox/action-setup-pnpm@v3.2.0
