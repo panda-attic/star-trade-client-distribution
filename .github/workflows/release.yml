@@ -44,11 +44,15 @@ jobs:
           echo "RENDERER_VITE_CLARITY_ID=${{ vars.CLARITY_ID }}" >> .env
           echo "RENDERER_VITE_UMAMI_ID=${{ vars.UMAMI_ID }}" >> .env
 
-      - name: Setup Node Pnpm
-        uses: wyvox/action-setup-pnpm@v4.0.0
+      # pnpm 版本会自动读取 package.json#packageManager 字段
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
         with:
           node-version-file: '.nvmrc'
-          # pnpm 版本会自动读取 package.json#packageManager 字段
+          cache: 'pnpm'
 
       - name: Install Dependencies
         run: |
@@ -74,4 +78,3 @@ jobs:
             dist/*.dmg
             dist/*.exe
             dist/*.zip
-        
